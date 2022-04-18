@@ -1,5 +1,4 @@
 package com.odogwudev.stockmarketcompose.presentation.company_listings
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,52 +11,56 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.lang.Error
 import javax.inject.Inject
 
 @HiltViewModel
 class CompanyListingsViewModel @Inject constructor(
     private val repository: StockRepository
-) : ViewModel() {
+): ViewModel() {
+
     var state by mutableStateOf(CompanyListingsState())
-    private var searchjob: Job? = null
+
+    private var searchJob: Job? = null
+
+    init {
+        getCompanyListings()
+    }
 
     fun onEvent(event: CompanyListingsEvent) {
-        when (event) {
+        when(event) {
             is CompanyListingsEvent.Refresh -> {
-                getCOmpanyListings(fetchFromRemote = true)
+                getCompanyListings(fetchFromRemote = true)
             }
-            is CompanyListingsEvent.OnSearchQueryChanged -> {
+            is CompanyListingsEvent.OnSearchQueryChange -> {
                 state = state.copy(searchQuery = event.query)
-                searchjob?.cancel()
-                searchjob = viewModelScope.launch {
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
                     delay(500L)
-                    getCOmpanyListings()
+                    getCompanyListings()
                 }
             }
         }
     }
 
-    fun getCOmpanyListings(
+    private fun getCompanyListings(
         query: String = state.searchQuery.lowercase(),
         fetchFromRemote: Boolean = false
     ) {
         viewModelScope.launch {
-            repository.getCompanyListings(fetchFromRemote, query)
+            repository
+                .getCompanyListings(fetchFromRemote, query)
                 .collect { result ->
-                    when (result) {
+                    when(result) {
                         is Resource.Success -> {
                             result.data?.let { listings ->
                                 state = state.copy(
-                                    companies = listings //avoid race conditions
+                                    companies = listings
                                 )
                             }
                         }
+                        is Resource.Error -> Unit
                         is Resource.Loading -> {
                             state = state.copy(isLoading = result.isLoading)
-                        }
-                        is Resource.Error -> {
-                            ("Couldn't Load the dat IO Exception ")
                         }
                     }
                 }

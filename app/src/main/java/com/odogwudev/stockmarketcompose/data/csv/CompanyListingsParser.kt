@@ -1,6 +1,6 @@
 package com.odogwudev.stockmarketcompose.data.csv
 
-import com.odogwudev.stockmarketcompose.domain.model.CompanyListingModel
+import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
 import com.opencsv.CSVReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,29 +10,27 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton //only one of this should be created
-class CompanyListingsParser @Inject constructor() : CSVParser<CompanyListingModel> {
+class CompanyListingsParser @Inject constructor() : CSVParser<CompanyListing> {
     // constructor staying empty so daggger hilt knows the objects to create and provide it for other dependencies
-    override suspend fun parse(stream: InputStream): List<CompanyListingModel> {
+    override suspend fun parse(stream: InputStream): List<CompanyListing> {
         val csvReader = CSVReader(InputStreamReader(stream))
         return withContext(Dispatchers.IO) {
             csvReader
                 .readAll()
-                .drop(1)//first row doesn't contain company data
+                .drop(1)
                 .mapNotNull { line ->
                     val symbol = line.getOrNull(0)
                     val name = line.getOrNull(1)
                     val exchange = line.getOrNull(2)
-                    CompanyListingModel(
+                    CompanyListing(
                         name = name ?: return@mapNotNull null,
                         symbol = symbol ?: return@mapNotNull null,
                         exchange = exchange ?: return@mapNotNull null
                     )
                 }
                 .also {
-                    csvReader.close( )
+                    csvReader.close()
                 }
         }
     }
-
-
 }

@@ -10,16 +10,19 @@ interface StockDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCompanyListings(
-        companyListingEntities: List<CompanyListingENtity>
+        companyListingEntities: List<CompanyListingEntity>
     )
 
-    @Query("DELETE FROM  companylistingentity")
-    suspend fun cleaeCompanyListing()
+    @Query("DELETE FROM companylistingentity")
+    suspend fun clearCompanyListings()
 
     @Query(
         """
-        SELECT * FROM companylistingentity WHERE LOWER(name) LIKE '%' || LOWER(:query) ||  '%' OR UPPER(:query)==  symbol
-    """
+            SELECT * 
+            FROM companylistingentity
+            WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%' OR
+                UPPER(:query) == symbol
+        """
     )
-    suspend fun searchCompanyListing(query: String): List<CompanyListingENtity>
+    suspend fun searchCompanyListing(query: String): List<CompanyListingEntity>
 }

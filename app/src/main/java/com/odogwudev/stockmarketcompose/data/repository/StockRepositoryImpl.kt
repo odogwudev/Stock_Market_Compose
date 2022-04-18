@@ -1,37 +1,32 @@
 package com.odogwudev.stockmarketcompose.data.repository
 
 import com.odogwudev.stockmarketcompose.data.csv.CSVParser
-import com.odogwudev.stockmarketcompose.data.csv.CompanyListingsParser
 import com.odogwudev.stockmarketcompose.data.local.StockDatabase
 import com.odogwudev.stockmarketcompose.data.mapper.toCompanyListing
 import com.odogwudev.stockmarketcompose.data.mapper.toCompanyListingEntity
 import com.odogwudev.stockmarketcompose.data.remote.StockApi
-import com.odogwudev.stockmarketcompose.domain.model.CompanyListingModel
+import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
 import com.odogwudev.stockmarketcompose.domain.repository.StockRepository
 import com.odogwudev.stockmarketcompose.util.Resource
-import com.opencsv.CSVReader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
-import retrofit2.Response
 import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StockRepositoryImpl @Inject constructor(
-    val api: StockApi,
-    val db: StockDatabase,
-    val companyListingsParser: CSVParser<CompanyListingModel>
+    private val api: StockApi,
+    private val db: StockDatabase,
+    private val companyListingsParser: CSVParser<CompanyListing>
 ) : StockRepository {
 
     private val dao = db.dao
     override suspend fun getCompanyListings(
         fetchFromRemote: Boolean,
         query: String
-    ): Flow<Resource<List<CompanyListingModel>>> {
+    ): Flow<Resource<List<CompanyListing>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
             val localListings = dao.searchCompanyListing(query)
@@ -64,7 +59,7 @@ class StockRepositoryImpl @Inject constructor(
             }
 
             remoteListings?.let { listings ->
-                dao.cleaeCompanyListing()
+                dao.clearCompanyListings()
                 dao.insertCompanyListings(
                     listings.map { it.toCompanyListingEntity() } // this line doesn't stick to the single principle of truth which means we only get dat from the database
                 )

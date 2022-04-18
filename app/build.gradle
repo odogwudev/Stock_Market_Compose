@@ -22,7 +22,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.plcoding.stockmarketapp"
+        applicationId "com.odogwudev.stockmarketcompose"
         minSdk 21
         targetSdk 32
         versionCode 1
@@ -31,6 +31,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
         }
     }
 
