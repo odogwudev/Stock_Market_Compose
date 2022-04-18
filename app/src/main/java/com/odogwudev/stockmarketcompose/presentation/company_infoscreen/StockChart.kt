@@ -10,14 +10,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.odogwudev.stockmarketcompose.domain.model.IntraDayInfo
+import com.odogwudev.stockmarketcompose.domain.model.IntradayInfo
 import kotlin.math.round
 import kotlin.math.roundToInt
 
 // i would be using canvases here
 @Composable
 fun StockChart(
-    infos: List<IntraDayInfo> = emptyList(),
+    infos: List<IntradayInfo> = emptyList(),
     modifier: Modifier = Modifier,
     graphColor: Color = Color.Green
 ) {
@@ -26,7 +26,8 @@ fun StockChart(
         remember {// remember because we dont want to recaluclate values everytime on recomposition
             graphColor.copy(alpha = 0.5f)
         }
-    val upperValue = remember(infos) {///remember value is recalculated when infos change
+    ///remember value is recalculated when infos change
+    val upperValue = remember(infos) {
         (infos.maxOfOrNull { it.close }?.plus(1))?.roundToInt() ?: 0
     }
     val lowerValue = remember(infos) {
@@ -37,7 +38,7 @@ fun StockChart(
 
     val density =
         LocalDensity.current//we pass it here so when density changes we recalculate thispaint object
-    val textPaint = remember {
+    val textPaint = remember(density) {
         Paint().apply {
             color = android.graphics.Color.WHITE
             textAlign = Paint.Align.CENTER
@@ -46,13 +47,11 @@ fun StockChart(
     }
 
     Canvas(modifier = modifier) {
-
         val spacePerHour =
             (size.width - spacing) / infos.size //this refers to x axis(space per hour is value in pixel of how much we have in hour between values
         (0 until infos.size - 1 step 2).forEach { i -> // just loop through infos an take every 2 hours
             val info = infos[i]
             val hour = info.date.hour
-
             drawContext.canvas.nativeCanvas.apply {
                 drawText(
                     hour.toString(),
@@ -63,12 +62,12 @@ fun StockChart(
             }
         }
         val priceStep = (upperValue - lowerValue) / 5f
-        (0..5).forEach { i ->
+        (0..4).forEach { i ->
             drawContext.canvas.nativeCanvas.apply {
                 drawText(
                     round(lowerValue + priceStep * i).toString(),
                     30f,
-                    size.height - spacing - i * height / 5f,
+                    size.height - spacing - i * size.height / 5f,
                     textPaint
                 )
             }
@@ -80,18 +79,15 @@ fun StockChart(
             for (i in infos.indices) {
                 val info = infos[i]
                 val nextInfo = infos.getOrNull(i + 1) ?: infos.last()
-                val leftRatio =
-                    (info.close - lowerValue) / (upperValue - lowerValue) //percentage value of info point
-                val rightRatio = (info.close - lowerValue) / (upperValue - lowerValue)
+                val leftRatio = (info.close - lowerValue) / (upperValue - lowerValue)
+                val rightRatio = (nextInfo.close - lowerValue) / (upperValue - lowerValue)
 
                 val x1 = spacing + i * spacePerHour
                 val y1 = height - spacing - (leftRatio * height).toFloat()
-                val x2 = spacing + i + 1 * spacePerHour
+                val x2 = spacing + (i + 1) * spacePerHour
                 val y2 = height - spacing - (rightRatio * height).toFloat()
                 if (i == 0) {
-                    moveTo(
-                        x1, y1
-                    )
+                    moveTo(x1, y1)
                 }
                 lastX = (x1 + x2) / 2f
                 quadraticBezierTo(
@@ -107,7 +103,6 @@ fun StockChart(
                 lineTo(spacing, size.height - spacing)
                 close()
             }
-
         drawPath(
             path = fillPath,
             brush = Brush.verticalGradient(
@@ -118,7 +113,6 @@ fun StockChart(
                 endY = size.height - spacing
             )
         )
-
         drawPath(
             path = strokePath,
             color = graphColor,

@@ -10,7 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.odogwudev.stockmarketcompose.presentation.company_listings.NavGraphs
+import com.odogwudev.stockmarketcompose.presentation.NavGraphs
 import com.odogwudev.stockmarketcompose.ui.theme.StockMarketAppTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint

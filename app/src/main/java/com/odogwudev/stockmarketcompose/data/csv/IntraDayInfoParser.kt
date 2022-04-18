@@ -1,22 +1,20 @@
 package com.odogwudev.stockmarketcompose.data.csv
 
-import com.odogwudev.stockmarketcompose.data.mapper.toIntraDayInfo
-import com.odogwudev.stockmarketcompose.data.remote.dto.IntraDayDTO
-import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
-import com.odogwudev.stockmarketcompose.domain.model.IntraDayInfo
+import com.odogwudev.stockmarketcompose.data.mapper.toIntradayInfo
+import com.odogwudev.stockmarketcompose.data.remote.dto.IntradayInfoDto
+import com.odogwudev.stockmarketcompose.domain.model.IntradayInfo
 import com.opencsv.CSVReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.LocalDateTime
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-
 @Singleton //only one of this should be created
-class IntradayInfoParser @Inject constructor(): CSVParser<IntraDayInfo> {
+class IntradayInfoParser @Inject constructor(): CSVParser<IntradayInfo> {
 
-    override suspend fun parse(stream: InputStream): List<IntraDayInfo> {
+    override suspend fun parse(stream: InputStream): List<IntradayInfo> {
         val csvReader = CSVReader(InputStreamReader(stream))
         return withContext(Dispatchers.IO) {
             csvReader
@@ -25,11 +23,11 @@ class IntradayInfoParser @Inject constructor(): CSVParser<IntraDayInfo> {
                 .mapNotNull { line ->
                     val timestamp = line.getOrNull(0) ?: return@mapNotNull null
                     val close = line.getOrNull(4) ?: return@mapNotNull null
-                    val dto = IntraDayDTO(timestamp, close.toDouble())
-                    dto.toIntraDayInfo()
+                    val dto = IntradayInfoDto(timestamp, close.toDouble())
+                    dto.toIntradayInfo()
                 }
                 .filter {
-                    it.date.dayOfMonth == LocalDateTime.now().minusDays(1).dayOfMonth
+                    it.date.dayOfMonth == LocalDate.now().minusDays(4).dayOfMonth
                 }
                 .sortedBy {
                     it.date.hour

@@ -1,7 +1,7 @@
 package com.odogwudev.stockmarketcompose.data.mapper
 
 import com.odogwudev.stockmarketcompose.data.local.CompanyListingEntity
-import com.odogwudev.stockmarketcompose.data.remote.dto.CompanyInfoDTO
+import com.odogwudev.stockmarketcompose.data.remote.dto.CompanyInfoDto
 import com.odogwudev.stockmarketcompose.domain.model.CompanyInfo
 import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
 
@@ -21,11 +21,12 @@ fun CompanyListing.toCompanyListingEntity(): CompanyListingEntity {
     )
 }
 
-fun CompanyInfoDTO.toCompanyInfo(): CompanyInfo {
+fun CompanyInfoDto.toCompanyInfo(): CompanyInfo {
     return CompanyInfo(
-        symbol = symbol
-            ?: "",/// doing it this way (nullable because the limitation of free api is 5 calls a minute otherwise we get a different json representation saying exceeded the limit
+        symbol = symbol ?: "",
         description = description ?: "",
-        name = name ?: "", country = country ?: "", industry = industry ?: ""
+        name = name ?: "",
+        country = country ?: "",
+        industry = industry ?: ""
     )
 }

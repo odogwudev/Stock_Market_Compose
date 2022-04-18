@@ -5,7 +5,7 @@ import com.odogwudev.stockmarketcompose.data.csv.CompanyListingsParser
 import com.odogwudev.stockmarketcompose.data.csv.IntradayInfoParser
 import com.odogwudev.stockmarketcompose.data.repository.StockRepositoryImpl
 import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
-import com.odogwudev.stockmarketcompose.domain.model.IntraDayInfo
+import com.odogwudev.stockmarketcompose.domain.model.IntradayInfo
 import com.odogwudev.stockmarketcompose.domain.repository.StockRepository
 import dagger.Binds
 import dagger.Module
@@ -22,7 +22,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindIntraDayInfoParser(intradayInfoParser: IntradayInfoParser): CSVParser<IntraDayInfo>
+    abstract fun bindIntradayInfoParser(
+        intradayInfoParser: IntradayInfoParser
+    ): CSVParser<IntradayInfo>
 
     @Binds
     @Singleton

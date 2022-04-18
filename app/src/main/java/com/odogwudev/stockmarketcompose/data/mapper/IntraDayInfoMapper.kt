@@ -1,17 +1,17 @@
 package com.odogwudev.stockmarketcompose.data.mapper
 
-import com.odogwudev.stockmarketcompose.data.remote.dto.IntraDayDTO
-import com.odogwudev.stockmarketcompose.domain.model.IntraDayInfo
+import com.odogwudev.stockmarketcompose.data.remote.dto.IntradayInfoDto
+import com.odogwudev.stockmarketcompose.domain.model.IntradayInfo
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-fun IntraDayDTO.toIntraDayInfo(): IntraDayInfo {
-    val pattern = "yyyy-MM-DD HH:mm:ss"
+fun IntradayInfoDto.toIntradayInfo(): IntradayInfo {
+    val pattern = "yyyy-MM-dd HH:mm:ss"
     val formatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
-    val localDateTime = LocalDateTime.parse(timeStamp, formatter)
-    return IntraDayInfo(
+    val localDateTime = LocalDateTime.parse(timestamp, formatter)
+    return IntradayInfo(
         date = localDateTime,
         close = close
-    )// dto object is not the same as domain level object
+    )
 }

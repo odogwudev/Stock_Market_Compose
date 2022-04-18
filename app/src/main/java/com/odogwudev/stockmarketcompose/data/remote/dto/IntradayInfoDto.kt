@@ -1,6 +1,6 @@
 package com.odogwudev.stockmarketcompose.data.remote.dto
 
-data class IntraDayDTO(
-    val timeStamp: String,
+data class IntradayInfoDto(
+    val timestamp: String,
     val close: Double
 )

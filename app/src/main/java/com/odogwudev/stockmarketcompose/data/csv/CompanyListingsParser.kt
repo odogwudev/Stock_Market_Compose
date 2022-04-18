@@ -12,6 +12,7 @@ import javax.inject.Singleton
 @Singleton //only one of this should be created
 class CompanyListingsParser @Inject constructor() : CSVParser<CompanyListing> {
     // constructor staying empty so daggger hilt knows the objects to create and provide it for other dependencies
+
     override suspend fun parse(stream: InputStream): List<CompanyListing> {
         val csvReader = CSVReader(InputStreamReader(stream))
         return withContext(Dispatchers.IO) {
