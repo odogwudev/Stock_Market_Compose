@@ -1,5 +1,6 @@
 package com.odogwudev.stockmarketcompose.data.remote
 
+import com.odogwudev.stockmarketcompose.data.remote.dto.CompanyInfoDTO
 import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,7 +14,19 @@ interface StockApi {
 
 
     companion object {
-        const val API_KEY = "Q63Y9NX3TUF587NF"
+        const val API_KEY = "7MNHGRS58U4N91BM"
         const val BASE_URL = "https://alphavantage.co"
     }
-}//7MNHGRS58U4N91BM
+
+    @GET("query?function=OVERVIEW")
+    suspend fun getCompanyInfo(
+        @Query("symbol") symbol: String,
+         @Query("apikey") apiKey: String = API_KEY
+    ):CompanyInfoDTO
+
+    @GET("query?function=TIME_SERIES_INTRADAY&interval=60min&datatype=csv")
+    suspend fun getIntroDayInfo(
+        @Query("symbol") symbol: String,
+        @Query("apikey") apiKey: String = API_KEY
+    ): ResponseBody
+}

@@ -1,11 +1,15 @@
 package com.odogwudev.stockmarketcompose.data.repository
 
 import com.odogwudev.stockmarketcompose.data.csv.CSVParser
+import com.odogwudev.stockmarketcompose.data.csv.IntradayInfoParser
 import com.odogwudev.stockmarketcompose.data.local.StockDatabase
+import com.odogwudev.stockmarketcompose.data.mapper.toCompanyInfo
 import com.odogwudev.stockmarketcompose.data.mapper.toCompanyListing
 import com.odogwudev.stockmarketcompose.data.mapper.toCompanyListingEntity
 import com.odogwudev.stockmarketcompose.data.remote.StockApi
+import com.odogwudev.stockmarketcompose.domain.model.CompanyInfo
 import com.odogwudev.stockmarketcompose.domain.model.CompanyListing
+import com.odogwudev.stockmarketcompose.domain.model.IntraDayInfo
 import com.odogwudev.stockmarketcompose.domain.repository.StockRepository
 import com.odogwudev.stockmarketcompose.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +23,8 @@ import javax.inject.Singleton
 class StockRepositoryImpl @Inject constructor(
     private val api: StockApi,
     private val db: StockDatabase,
-    private val companyListingsParser: CSVParser<CompanyListing>
+    private val companyListingsParser: CSVParser<CompanyListing>,
+    private val intradayInfoParser: CSVParser<IntraDayInfo>
 ) : StockRepository {
 
     private val dao = db.dao
@@ -74,4 +79,30 @@ class StockRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getIntraDayInfo(symbol: String): Resource<List<IntraDayInfo>> {
+        return try {
+            val respone = api.getIntroDayInfo(symbol) //parse it to a list of intrpdata info
+            val results = intradayInfoParser.parse(respone.byteStream())
+            Resource.Success(results)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Resource.Error("Couldn't Load Intra DayInfo")
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            Resource.Error("Couldn't Load Intra DayInfo")
+        }
+    }
+
+    override suspend fun getCompanyInfo(symbol: String): Resource<CompanyInfo> {
+        return try {
+            val result = api.getCompanyInfo(symbol)
+            Resource.Success(result.toCompanyInfo() )
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Resource.Error("Couldn't Load Company Info")
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            Resource.Error("Couldn't Load Company Info")
+        }
+    }
 }
